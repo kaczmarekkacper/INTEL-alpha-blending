@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	sf::RenderWindow window(sf::VideoMode(800, 600), "Something");
+	sf::RenderWindow window(sf::VideoMode(800, 600), "Alpha-Blending");
 	if( argc < 3)
 	{
 		cout <<"Please insert a first or second input file name and output file name.\n";
@@ -88,13 +88,22 @@ int main(int argc, char* argv[])
 				cout << "Cant create a output file.\n";
 				return 0;
 			}
-			fout.write((char*)output1, length1);
+			fout.write(output1, length1);
 			if(!firstInput.read(output1, length1))
 			{
 				cout << "Can't read first file to char array./n";
-			return 0;
+				return 0;
 			}
+			//ifstream out;
+			//out.open("out.bmp", ios::binary | ios::in);
+			if (!texture1.loadFromMemory(output1, length1))
+			{
+				cout << "Cant display output file./n";
+				return 0;
+			}
+			sprite.setTexture(texture1);
 			fout.close();
+			//out.close();
 		}
 		
 	}

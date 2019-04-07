@@ -11,4 +11,8 @@ f.o: f.s
 	nasm -f elf64 f.s -o f.o
 
 clean:
-	rm -f *.o main out.bmp
+	rm -f *.o
+	rm -f out.bmp
+	rm -f main
+open:
+	./main black.bmp white.bmp
