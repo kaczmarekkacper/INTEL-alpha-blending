@@ -69,6 +69,16 @@ int main(int argc, char* argv[])
 	while( window.isOpen())
 	{
 		window.display();
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+    			sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+			cout << localPosition.x << " " << localPosition.y << "\n";
+			while(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				// waiting
+			}
+		}
+		
 	}
 	// Writing to file
 	ofstream fout("out.bmp", ios::binary);
