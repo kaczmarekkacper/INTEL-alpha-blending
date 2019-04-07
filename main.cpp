@@ -1,44 +1,54 @@
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
+#include <stdio.h>
+using namespace std;
+
 int main(int argc, char* argv[])
 {
-	if( argc < 4)
+	if( argc < 3)
 	{
-		printf("Please insert a first and second input file name and output file name.");
+		cout <<"Please insert a first or second input file name and output file name.\n";
 		return 0;
 	}
-	std::ifstream DataFile(argv[1], std::ios::binary);
-	if(!DataFile.good())
+	// Opening first file
+	fstream firstInput;
+	fstream temporary1;
+	temporary1.open(argv[1], ios::in | ios::binary);
+	firstInput.open(argv[1], ios::in | ios::binary);
+	if( !firstInput.good() || !temporary1.good())
 	{
-		printf("Something wrong with first input file.");
+		cout <<"Something wrong with first input file.\n";
+		return 0;
+	};
+	temporary1.seekg(0, ios::end);
+	long length1 = temporary1.tellg();
+	cout << "wszystko ok\n" << temporary1.tellg() << "\n";
+	// Opening seocnd file
+	fstream secondInput;
+	fstream temporary2;
+	temporary2.open(argv[2], ios::in | ios::binary);
+	secondInput.open(argv[2], ios::in | ios::binary);
+	if( !secondInput.good()|| !temporary2.good() )
+	{
+		cout <<"Something wrong with second input file.\n";
 		return 0;
 	}
-	DataFile.seekg(0, std::ios::end);
-	size_t filesize = (int)DataFile.tellg();
-	DataFile.seekg(0);
-	unsigned char output[filesize];
-	if(DataFile.read((char*)output, filesize))
+	temporary2.seekg(0, ios::end);
+	long length2 = temporary2.tellg();
+	cout << "wszystko ok\n" << temporary2.tellg() << "\n";
+	// Checking size of files
+	if ( length1 != length2 )
 	{
+		cout << "Size of files must be equal.\n";
+	}
+	unsigned char output1[length1];
+	if(firstInput.read((char*)output1, length1))
+	{
+		ofstream fout(argv[1], ios::binary);
 		if(!fout.good())
 			return 0;
-		fout.write((char*)output, filesize);
+		fout.write((char*)output1, length1);
 	}
-	std::ifstream DataFile(argv[2], std::ios::binary);
-	if(!DataFile.good())
-	{
-		printf("Something wrong with second input file.");
-		return 0;
-	}
-	DataFile.seekg(0, std::ios::end);
-	size_t filesize2 = (int)DataFile.tellg();
-	DataFile.seekg(0);
-	unsigned char output2[filesize2];
-	if(DataFile.read((char*)output2, filesize2))
-	{
-		if(!fout.good())
-			return 0;
-		fout.write((char*)output2, filesize2);
-	}
-	
 	return 0;
 }
