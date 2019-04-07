@@ -2,10 +2,13 @@
 #include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <SFML/Graphics.hpp>
+
 using namespace std;
 
 int main(int argc, char* argv[])
 {
+	sf::RenderWindow window(sf::VideoMode(800, 600), "Something");
 	if( argc < 3)
 	{
 		cout <<"Please insert a first or second input file name and output file name.\n";
@@ -42,13 +45,38 @@ int main(int argc, char* argv[])
 	{
 		cout << "Size of files must be equal.\n";
 	}
+	// Copy files to char arrays
 	unsigned char output1[length1];
-	if(firstInput.read((char*)output1, length1))
+	if(!firstInput.read((char*)output1, length1))
 	{
-		ofstream fout(argv[1], ios::binary);
-		if(!fout.good())
-			return 0;
-		fout.write((char*)output1, length1);
+		cout << "Can't read first file to char array./n";
+		return 0;
 	}
+	unsigned char output2[length2];
+	if(!secondInput.read((char*)output2, length2))
+	{
+		cout << "Can't read second file to char array./n";
+		return 0;
+	}
+	sf::Texture texture1;
+	if (!texture1.loadFromFile(argv[1]))
+	{
+		cout << "Cant load first file./n";
+		return 0;
+	}
+	sf::Sprite sprite;
+	sprite.setTexture(texture1);
+	while( window.isOpen())
+	{
+		window.display();
+	}
+	// Writing to file
+	ofstream fout("out.bmp", ios::binary);
+	if(!fout.good())
+	{
+		cout << "Cant create a output file.\n";
+		return 0;
+	}
+	fout.write((char*)output1, length1);
 	return 0;
 }

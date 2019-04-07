@@ -1,12 +1,12 @@
 CC = g++
-CFLAGS = -m32 -Wall
+CFLAGS = -Wall
 LIBS = -lsfml-graphics -lsfml-window -lsfml-system
 
 all: main.o
-	$(CC) $(CLAGFS) $(LIBS) main.o -o main
+	$(CC) main.o -o main $(CLAGFS) $(LIBS) 
 
 main.o: main.cpp
-	$(CC) -c main.cpp
+	$(CC) -c main.cpp $(CLFAGS) $(LIBS) 
 
 clean:
-	rm -f *.o test
+	rm -f *.o main
