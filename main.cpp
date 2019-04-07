@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SFML/Graphics.hpp>
+#include "f.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ int main(int argc, char* argv[])
 	temporary1.seekg(0, ios::end);
 	long length1 = temporary1.tellg();
 	cout << "wszystko ok\n" << temporary1.tellg() << "\n";
+	temporary1.close();
 	// Opening seocnd file
 	fstream secondInput;
 	fstream temporary2;
@@ -40,20 +42,21 @@ int main(int argc, char* argv[])
 	temporary2.seekg(0, ios::end);
 	long length2 = temporary2.tellg();
 	cout << "wszystko ok\n" << temporary2.tellg() << "\n";
+	temporary2.close();
 	// Checking size of files
 	if ( length1 != length2 )
 	{
 		cout << "Size of files must be equal.\n";
 	}
 	// Copy files to char arrays
-	unsigned char output1[length1];
-	if(!firstInput.read((char*)output1, length1))
+	char output1[length1];
+	if(!firstInput.read(output1, length1))
 	{
 		cout << "Can't read first file to char array./n";
 		return 0;
 	}
-	unsigned char output2[length2];
-	if(!secondInput.read((char*)output2, length2))
+	char output2[length2];
+	if(!secondInput.read(output2, length2))
 	{
 		cout << "Can't read second file to char array./n";
 		return 0;
@@ -77,16 +80,25 @@ int main(int argc, char* argv[])
 			{
 				// waiting
 			}
+			f(output1, output2, localPosition.x, localPosition.y);
+			// Writing to file
+			ofstream fout("out.bmp", ios::binary);
+			if(!fout.good())
+			{
+				cout << "Cant create a output file.\n";
+				return 0;
+			}
+			fout.write((char*)output1, length1);
+			if(!firstInput.read(output1, length1))
+			{
+				cout << "Can't read first file to char array./n";
+			return 0;
+			}
+			fout.close();
 		}
 		
 	}
-	// Writing to file
-	ofstream fout("out.bmp", ios::binary);
-	if(!fout.good())
-	{
-		cout << "Cant create a output file.\n";
-		return 0;
-	}
-	fout.write((char*)output1, length1);
+	firstInput.close();
+	secondInput.close();
 	return 0;
 }

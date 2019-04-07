@@ -1,5 +1,4 @@
 section .text
-global main
+global f
 
-main:
-
+f:
