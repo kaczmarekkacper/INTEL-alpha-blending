@@ -120,21 +120,37 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	secondInput.seekg(0, ios::beg);
-	sf::Image image;
-	image.loadFromFile(argv[1]);
+	
+	sf::RenderWindow window(sf::VideoMode(width1, height1), "Alpha-Blending");
+	
+	sf::Image image1;
+	image1.loadFromFile(argv[1]);
 	sf::Texture texture1;
-	if (!texture1.loadFromImage(image))
+	if (!texture1.loadFromImage(image1))
 	{
-		cout << "Cant load first file./n";
+		cout << "Cant load first image./n";
 		return 0;
 	}
-	sf::RenderWindow window(sf::VideoMode(width1, height1), "Alpha-Blending");
-	sf::Sprite sprite;
-	sprite.setTexture(texture1);
-	window.draw(sprite);
-	window.display();
-	while( window.isOpen())
+	sf::Sprite sprite1;
+	sprite1.setTexture(texture1);
+	window.draw(sprite1);
+	
+	sf::Image image2;
+	image2.loadFromFile(argv[2]);
+	sf::Texture texture2;
+	if (!texture2.loadFromImage(image2))
 	{
+		cout << "Cant load second image./n";
+		return 0;
+	}
+	sf::Sprite sprite2;
+	sprite2.setTexture(texture2);
+	window.draw(sprite2);
+	
+	window.display();
+	
+	while( window.isOpen())
+	{	`
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
     			sf::Vector2i localPosition = sf::Mouse::getPosition(window);
@@ -143,34 +159,60 @@ int main(int argc, char* argv[])
 			while(sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
 			}
-			cout << localPosition.x << " " << localPosition.y << "\n";
-			f(output1, output2, localPosition.x, localPosition.y, width1, height1);
+			cout << localPosition.x << " " << height1-localPosition.y << "\n";
+			f(output1, output2, localPosition.x, height1-localPosition.y, width1, height1);
 			// Writing to file
-			ofstream fout("out.bmp", ios::binary);
-			if(!fout.good())
+			ofstream fout1("out1.bmp", ios::binary);
+			ofstream fout2("out2.bmp", ios::binary);
+			if(!fout1.good())
 			{
-				cout << "Cant create a output file.\n";
+				cout << "Cant create a first output file.\n";
 				return 0;
 			}
-			fout.write(output1, length1);
+			
+			if(!fout2.good())
+			{
+				cout << "Cant create a second output file.\n";
+				return 0;
+			}
+				
+			fout1.write(output1, length1);
+			fout2.write(output2, length2);
+			
 			if(!firstInput.read(output1, length1))
 			{
 				cout << "Can't read first file to char array.\n";
 				return 0;
 			}
-			firstInput.seekg(0, ios::beg);
-			//ifstream out;
-			//out.open("out.bmp", ios::binary | ios::in);
-			sf::Image image2;
-			image2.loadFromFile("out.bmp");
-			if (!texture1.loadFromImage(image))
+			if(!secondInput.read(output2, length2))
 			{
-				cout << "Cant display output file.\n";
+				cout << "Can't read second file to char array.\n";
 				return 0;
 			}
-			sprite.setTexture(texture1);
-			fout.close();
-			//out.close();
+			
+			firstInput.seekg(0, ios::beg);
+			secondInput.seekg(0, ios::beg);
+
+			sf::Image image3;
+			image3.loadFromFile("out1.bmp");
+			if (!texture1.loadFromImage(image3))
+			{
+				cout << "Cant display a first output file.\n";
+				return 0;
+			}
+			sprite1.setTexture(texture1);
+			fout1.close();
+			window.draw(sprite1);
+			sf::Image image4;
+			image4.loadFromFile("out2.bmp");
+			if (!texture2.loadFromImage(image4))
+			{
+				cout << "Cant display a second output file.\n";
+				return 0;
+			}
+			sprite2.setTexture(texture2);
+			fout2.close();
+			window.draw(sprite2);
 			window.display();
 		}
 		
