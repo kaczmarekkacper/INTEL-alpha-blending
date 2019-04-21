@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
 	window.display();
 	
 	while( window.isOpen())
-	{	`
+	{	
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
     			sf::Vector2i localPosition = sf::Mouse::getPosition(window);

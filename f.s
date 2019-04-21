@@ -1,18 +1,20 @@
 section .data
-	OFFSET	equ	54
-	PEROID: dw 6.2831
-	TWOPI: dw 6.2831
-section .bss
-	c: resq 1
+	OFFSET: dw 54
+	PEROID: dw 20
 	
-extern sin
-
 section .text
 
 	global f
 
 f:
-	; r8 
+	; r8 - width1
+	; r9 - height1
+	; r10 - pointer on first element in output1 array
+	; r11 - pointer on first element in output2 array
+	; r12 - click.x
+	; r13 - click.y
+	; r14 - current x
+	; r15 - current y
 	mov r10, rdi
 	add r10, OFFSET ; set output1 in begin position of pixel array 
 	mov r11, rsi
@@ -23,30 +25,87 @@ f:
 	mov r15, 0 ; y value of current pixel
 	
 loop:
-	mov rdx, r14
-	mov rcx, r15
 	
-	sub rdx, r8 ; width-click.x
-	sub rcx, r9 ; height-click.y
-	mov rax, rdx ; rax = width-click.x
-	mul eax ; (width-click.x)^2
-	mov rdx, rax ; rdx = (width-click.x)^2
-	mov rax, rcx ;	rax = (height-click.y)
-	mul eax ; rax = (height-click.y)^2
-	mov rcx, rax ; rcx = (height-click.y)^2
-	add rcx, rdx ;  rcx = (width-click.x)^2 + (height-click.y)^2
+	mov rdx, r14 ; rdx = current.x
+	mov rcx, r15 ; rcx  = current.y
 	
-	fild rcx ; put rcx to ST(0)
-	fsqrt ; sqrt of rcx (c)
-	fmul TWOPI ; create new peroid
-	fild PEROID ; put PEROID to ST(1)
-	fprem ; dision with reminder c*2pi%PEROID
-	faddp 0x0 ; pop ST(1)
+	sub rdx, r12 ; rdx = current.x-click.x
+	sub rcx, r13 ; rcx = current.y-click.y
+	mov rax, rdx ; rax = current.x-click.x
+	mul eax ; rax = (current.x-click.x)^2
+	mov rdx, rax ; rdx = (current.x-click.x)^2
+	mov rax, rcx ;	rax = (current.y-click.y)
+	mul eax ; rax = (current.y-click.y)^2
+	mov rcx, rax ; rcx = (current.y-click.y)^2
+	add rcx, rdx ;  rcx = (current.x-click.x)^2 + (current.y-click.y)^2
+	
+	mov eax, [r10d] ; load to eax pixel from output1
+	mov ebx, [r11d] ; load to ebx pixel from output2
+	push rcx ; push (current.x-click.x)^2+(current.y-click.y)^2 on stack
+	fld dword [rsp] ; put rcx to ST(0)
+	pop rcx; ; poping to restore rsp
+	fsqrt ; sqrt of rcx ((current.x-click.x)^2 + (current.y-click.y)^2) 
+	fldpi ; st1 = pi
+	fdiv ; divided by pi
+	sub rsp, 4
+	fstp dword [rsp]
+	add rsp, 4
+	push dword 2
+	fld dword [rsp]
+	fdiv ; division by 2
+	sub rsp, 4
+	fstp dword [rsp]
+	add rsp, 4
+	push PEROID
+	fld dword [rsp] ; put PEROID to ST(1)
+	add rsp, 4
+	fmul ; c = sqrt(current.x-click.x)^2 + (current.y-click.y)^2)/2pi*PEROID
+	fprem ; c%PEROID
+	sub rsp, 4
+	fstp dword [rsp]
+	add rsp, 4
 	fsin ; calculate sin of reminder
 	fabs ; absolute value
-	fmul 
-	fstp c
+	xor rsi, rsi
+	mov sil, al
+	push rsi
+	fld dword [esp]
+	fmul
+	fst dword [esp]
+	pop rsi
+	mov al, sil
+	mov [r10d], eax
 	
-	
-	
+	fchs
+	fld1
+	fadd st0, st1
+	sub rsp, 4
+	fstp dword [rsp]
+	add rsp, 4
+	xor rsi, rsi
+	mov sil, bl
+	push rsi
+	fld dword [esp]
+	fmul
+	fst dword [esp]
+	pop rsi
+	mov bl, sil
+	mov [r11d], ebx
+	sub rsp, 4
+	fstp dword [rsp]
+	add rsp, 4
+	add r10, 4
+	add r11, 4
+	cmp r8, r14
+	jne incX
+	cmp r9, r15
+	jne incY
 	ret
+
+incX:
+	inc r14
+	jmp loop
+incY:
+	inc r15
+	xor r14, r14
+	jmp loop
