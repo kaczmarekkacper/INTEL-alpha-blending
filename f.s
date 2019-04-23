@@ -44,22 +44,23 @@ loop:
 	fsqrt ; sqrt of rcx ((current.x-click.x)^2 + (current.y-click.y)^2) 
 	fldpi ; st1 = pi
 	fdiv ; divided by pi
-	sub rsp, 4
-	fstp dword [rsp]
-	add rsp, 4
-	
-	push qword 2
-	fild qword [rsp]
-	add rsp, 8
-	fdiv ; division by 2
+	sub rsp, 8
+	fstp qword [rsp]
 	sub rsp, 8
 	fstp qword [rsp]
 	add rsp, 8
-	push qword 10 ; PEROID
-	fild qword [rsp] ; put PEROID to ST(1)
+	fld qword [rsp]
 	add rsp, 8
-	fmul ; c = sqrt(current.x-click.x)^2 + (current.y-click.y)^2)/2pi*PEROID
+	
+	push word 2
+	fidiv word [rsp] ; division by 2
+	add rsp, 2
+	push word 40 ; PEROID
+	fild word [rsp] ; put PEROID to ST(1)
+	
+	fimul word [rsp] ; c = sqrt(current.x-click.x)^2 + (current.y-click.y)^2)/2pi*PEROID
 	fprem ; c%PEROID
+	add rsp, 2
 	sub rsp, 8
 	fstp qword [rsp]
 	add rsp, 8
