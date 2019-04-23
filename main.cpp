@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	secondInput.read(temporary, 4);
 	uint16_t offset2;
 	memcpy(&offset2, temporary, sizeof(offset2));
-
+	cout << offset2 << endl;
 	//reading width
 	secondInput.seekg( 18, ios::beg );
 	secondInput.read(temporary, 4);
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 	{
 		cout << "Size of files must be equal.\n";
 	}
-
+	cout << length1 << " " << length2 << " rozmiary " << endl;
 	// Checking width
 	if ( width1 != width2 )
 	{
@@ -175,10 +175,11 @@ int main(int argc, char* argv[])
 				cout << "Cant create a second output file.\n";
 				return 0;
 			}
-				
+			
 			fout1.write(output1, length1);
 			fout2.write(output2, length2);
-			
+			firstInput.seekg(0, ios::beg);
+			secondInput.seekg(0, ios::beg);
 			if(!firstInput.read(output1, length1))
 			{
 				cout << "Can't read first file to char array.\n";
@@ -192,7 +193,7 @@ int main(int argc, char* argv[])
 			
 			firstInput.seekg(0, ios::beg);
 			secondInput.seekg(0, ios::beg);
-
+			
 			sf::Image image3;
 			image3.loadFromFile("out1.bmp");
 			if (!texture1.loadFromImage(image3))

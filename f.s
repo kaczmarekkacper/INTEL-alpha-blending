@@ -12,13 +12,13 @@ f:
 	; r14 - current x
 	; r15 - current y
 	mov r10, rdi
-	add r10, 50 ; set output1 in begin position of pixel array - 4
+	add r10, 121 ; set output1 in begin position of pixel array - 4
 	mov r11, rsi
-	add r11, 50 ; set output2 in begin position of pixel array - 4
+	add r11, 121 ; set output2 in begin position of pixel array - 4
 	mov r12, rdx ; move mouse's x position
 	mov r13, rcx ; move mouse's y position
-	mov r14, 0 ; x value of current pixel
-	mov r15, 0 ; y value of current pixel
+	mov r14, 1 ; x value of current pixel
+	mov r15, 1 ; y value of current pixel
 	
 loop:
 	add r10, 4
@@ -34,8 +34,8 @@ loop:
 	mul eax ; rax = (current.y-click.y)^2
 	mov rcx, rax ; rcx = (current.y-click.y)^2
 	add rcx, rdx ;  rcx = (current.x-click.x)^2 + (current.y-click.y)^2
-	mov eax, [r10] ; load to eax pixel from output1
-	mov ebx, [r11] ; load to ebx pixel from output2
+	mov al, [r10] ; load to eax pixel from output1
+	mov bl, [r11] ; load to ebx pixel from output2
 	push rcx ; push (current.x-click.x)^2+(current.y-click.y)^2 on stack
 	fld qword [rsp] ; put rcx to ST(0)
 	pop rcx ; poping to restore rsp
@@ -73,7 +73,7 @@ loop:
 	pop rsi
 	
 	mov al, sil
-	mov [r10], eax
+	mov [r10], al
 	fchs
 	fld1
 	fadd st0, st1
@@ -86,7 +86,7 @@ loop:
 	fistp qword [rsp]
 	pop rsi
 	mov bl, sil
-	mov [r11], ebx
+	mov [r11], bl
 	cmp r8, r14
 	jne incX
 	cmp r9, r15
@@ -99,4 +99,5 @@ incX:
 incY:
 	inc r15
 	xor r14, r14
+	add r14, 1
 	jmp loop
