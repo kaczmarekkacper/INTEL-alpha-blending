@@ -143,14 +143,20 @@ int main(int argc, char* argv[])
 		cout << "Cant load second image./n";
 		return 0;
 	}
+	sf::Sprite white;
+	white.setTexture(texture2);
 	sf::Sprite sprite2;
 	sprite2.setTexture(texture2);
 	window.draw(sprite2);
-	
 	window.display();
-	
+	firstInput.close();
+	secondInput.close();
 	while( window.isOpen())
 	{	
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			window.close();
+		}
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
     			sf::Vector2i localPosition = sf::Mouse::getPosition(window);
@@ -159,6 +165,8 @@ int main(int argc, char* argv[])
 			while(sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
 			}
+			firstInput.open(argv[1], ios::in | ios::binary);
+			secondInput.open(argv[2], ios::in | ios::binary);
 			cout << localPosition.x << " " << height1-localPosition.y << "\n";
 			f(output1, output2, localPosition.x, height1-localPosition.y, width1, height1);
 			// Writing to file
@@ -177,7 +185,9 @@ int main(int argc, char* argv[])
 			}
 			
 			fout1.write(output1, length1);
+			fout1.close();
 			fout2.write(output2, length2);
+			fout2.close();
 			firstInput.seekg(0, ios::beg);
 			secondInput.seekg(0, ios::beg);
 			if(!firstInput.read(output1, length1))
@@ -190,10 +200,8 @@ int main(int argc, char* argv[])
 				cout << "Can't read second file to char array.\n";
 				return 0;
 			}
-			
-			firstInput.seekg(0, ios::beg);
-			secondInput.seekg(0, ios::beg);
-			
+			firstInput.close();
+			secondInput.close();
 			sf::Image image3;
 			image3.loadFromFile("out1.bmp");
 			if (!texture1.loadFromImage(image3))
@@ -201,8 +209,11 @@ int main(int argc, char* argv[])
 				cout << "Cant display a first output file.\n";
 				return 0;
 			}
+			window.clear();
+			window.draw(white);
 			sprite1.setTexture(texture1);
-			fout1.close();
+			
+			
 			window.draw(sprite1);
 			sf::Image image4;
 			image4.loadFromFile("out2.bmp");
@@ -212,13 +223,13 @@ int main(int argc, char* argv[])
 				return 0;
 			}
 			sprite2.setTexture(texture2);
-			fout2.close();
+			
+			
 			window.draw(sprite2);
 			window.display();
+			
 		}
 		
 	}
-	firstInput.close();
-	secondInput.close();
 	return 0;
 }

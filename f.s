@@ -23,36 +23,27 @@ f:
 loop:
 	add r10, 4
 	add r11, 4
-	mov rdx, r14 ; rdx = current.x
-	mov rcx, r15 ; rcx  = current.y
-	sub rdx, r12 ; rdx = current.x-click.x
-	sub rcx, r13 ; rcx = current.y-click.y
-	mov rax, rdx ; rax = current.x-click.x
-	imul eax ; rax = (current.x-click.x)^2
-	mov rdx, rax ; rdx = (current.x-click.x)^2
-	mov rax, rcx ;	rax = (current.y-click.y)
-	imul eax ; rax = (current.y-click.y)^2
-	mov rcx, rax ; rcx = (current.y-click.y)^2
-	add rcx, rdx ;  rcx = (current.x-click.x)^2 + (current.y-click.y)^2
 	
-	push word 20 ; PEROID
-	fild word [rsp]; st0 = PEROID
-	add rsp, 2
-	push rcx ; push (current.x-click.x)^2+(current.y-click.y)^2 on stack
-	fild qword [rsp] ; put rcx to st0, st1 = PEROID
-	pop rcx ; poping to restore rsp
+	
+	push r14
+	fild qword [rsp]
+	pop r14
+	push r12
+	fild qword [rsp]
+	pop r12
+	fsubp
+	fmul st0, st0
+	push r15
+	fild qword [rsp]
+	pop r15
+	push r13
+	fild qword [rsp]
+	pop r13
+	fsubp
+	fmul st0, st0
+	faddp
+
 	fsqrt ; sqrt of rcx ((current.x-click.x)^2 + (current.y-click.y)^2) 
-	fldpi ; st0 = pi, st1 = sqrt(c) st2 = PEROID
-	fdivp ; divided sqrt(c) by pi and store in st1 ( st0 is pi st1 value of sqrt(c)/pi, st2 = PEROID) and pop st0
-	
-	push word 2
-	fidiv word [rsp] ; division by 2
-	add rsp, 2
-	push word 20 ; PEROID
-	fimul word [rsp] ; st0 = sqrt(c)/2pi*PEROID st1 = PEROID
-	add rsp, 2
-	fprem1 ; st0 =  sqrt(c)/2pi*PEROID%PEROID st1 = PEROID
-	fstp st1 ; st0 = sqrt(c)/2pi*PEROID%PEROID
 	fsin ; calculate sin of reminder
 	fabs ; absolute value
 	
