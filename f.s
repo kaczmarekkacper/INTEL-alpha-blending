@@ -28,57 +28,47 @@ loop:
 	sub rdx, r12 ; rdx = current.x-click.x
 	sub rcx, r13 ; rcx = current.y-click.y
 	mov rax, rdx ; rax = current.x-click.x
-	mul eax ; rax = (current.x-click.x)^2
+	imul eax ; rax = (current.x-click.x)^2
 	mov rdx, rax ; rdx = (current.x-click.x)^2
 	mov rax, rcx ;	rax = (current.y-click.y)
-	mul eax ; rax = (current.y-click.y)^2
+	imul eax ; rax = (current.y-click.y)^2
 	mov rcx, rax ; rcx = (current.y-click.y)^2
 	add rcx, rdx ;  rcx = (current.x-click.x)^2 + (current.y-click.y)^2
-	xor rsi, rsi
-	xor rdi, rdi
-	mov sil, [r10] ; load to eax pixel from output1
-	mov dil, [r11] ; load to ebx pixel from output2
+	
+	push word 20 ; PEROID
+	fild word [rsp]; st0 = PEROID
+	add rsp, 2
 	push rcx ; push (current.x-click.x)^2+(current.y-click.y)^2 on stack
-	fild qword [rsp] ; put rcx to ST(0)
+	fild qword [rsp] ; put rcx to st0, st1 = PEROID
 	pop rcx ; poping to restore rsp
 	fsqrt ; sqrt of rcx ((current.x-click.x)^2 + (current.y-click.y)^2) 
-	fldpi ; st1 = pi
-	fdiv ; divided by pi
-	sub rsp, 8
-	fstp qword [rsp]
-	sub rsp, 8
-	fstp qword [rsp]
-	add rsp, 8
-	fld qword [rsp]
-	add rsp, 8
+	fldpi ; st0 = pi, st1 = sqrt(c) st2 = PEROID
+	fdivp ; divided sqrt(c) by pi and store in st1 ( st0 is pi st1 value of sqrt(c)/pi, st2 = PEROID) and pop st0
 	
 	push word 2
 	fidiv word [rsp] ; division by 2
 	add rsp, 2
-	push word 40 ; PEROID
-	fild word [rsp] ; put PEROID to ST(1)
-	
-	fimul word [rsp] ; c = sqrt(current.x-click.x)^2 + (current.y-click.y)^2)/2pi*PEROID
-	fprem ; c%PEROID
+	push word 20 ; PEROID
+	fimul word [rsp] ; st0 = sqrt(c)/2pi*PEROID st1 = PEROID
 	add rsp, 2
-	sub rsp, 8
-	fstp qword [rsp]
-	add rsp, 8
+	fprem1 ; st0 =  sqrt(c)/2pi*PEROID%PEROID st1 = PEROID
+	fstp st1 ; st0 = sqrt(c)/2pi*PEROID%PEROID
 	fsin ; calculate sin of reminder
 	fabs ; absolute value
 	
+	xor rsi, rsi
+	xor rdi, rdi
+	mov sil, [r10] ; load to eax pixel from output1
+	mov dil, [r11] ; load to ebx pixel from output2
+	
 	push rsi
-	fild qword [rsp]
-	fmul
+	fild qword [rsp] ; content of register is st0, abs(sin) is st1
+	fmulp
 	fistp qword [rsp]
 	pop rsi
 	
 	mov [r10], sil
-	sub dil, sil
-	
-	sub rsp, 8
-	fstp qword [rsp]
-	add rsp, 8	
+	sub dil, sil	
 
 	mov [r11], dil
 	cmp r8, r14
