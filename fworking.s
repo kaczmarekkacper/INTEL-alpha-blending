@@ -24,9 +24,6 @@ loop:
 	add r10, 4
 	add r11, 4
 	
-	push word 6 ; PEROID
-	fild word [rsp]; st0 = PEROID
-	add rsp, 2
 	
 	push r14
 	fild qword [rsp]
@@ -47,15 +44,6 @@ loop:
 	faddp
 
 	fsqrt ; sqrt of rcx ((current.x-click.x)^2 + (current.y-click.y)^2) 
-	fldpi ; st0 = pi, st1 = sqrt(c) st2 = PEROID
-	fdivp ; divided sqrt(c) by pi and store in st1 ( st0 is pi st1 value of sqrt(c)/pi, st2 = PEROID) and pop st0
-	
-	push word 2
-	fidiv word [rsp] ; division by 2
-	add rsp, 2
-	fmul st0, st1 ; st0 = sqrt(c)/2pi*PEROID st1 = PEROID
-	fprem1 ; st0 =  sqrt(c)/2pi*PEROID%PEROID st1 = PEROID
-	fstp st1 ; st0 = sqrt(c)/2pi*PEROID%PEROID
 	fsin ; calculate sin of reminder
 	fabs ; absolute value
 	
